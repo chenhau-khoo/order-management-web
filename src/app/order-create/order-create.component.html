@@ -1,1 +1,22 @@
-<p>order-create works!</p>
+<div class="container">
+    <h1>Add Order</h1>
+    <form [formGroup]="requestForm" (ngSubmit)="onSubmit($event)">
+        <div class="form-group">
+            <label>Amount</label>
+            <input type="number" formControlName="amount" class="form-control"
+                [ngClass]="{ 'is-invalid': submitted && f.amount.errors }" placeholder="Enter Amount">
+            <div *ngIf="submitted && f.amount.errors" class="invalid-feedback">
+                <div *ngIf="f.amount.errors.required">Amount is required</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <input type="text" formControlName="desc" class="form-control"
+                [ngClass]="{ 'is-invalid': submitted && f.desc.errors }" placeholder="Enter Description">
+            <div *ngIf="submitted && f.desc.errors" class="invalid-feedback">
+                <div *ngIf="f.desc.errors.required">Description is required</div>
+            </div>
+        </div>
+        <button type="submit" class="btn-primary">Submit</button>
+    </form>
+</div>
