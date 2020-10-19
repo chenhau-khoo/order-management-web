@@ -5,6 +5,7 @@ import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { CreateOrder } from '../model/create-order';
 import { CreateOrderResp } from '../model/create-order-resp';
+import { ListOrderResp } from '../model/list-order-resp';
 import Swal from 'sweetalert2';
 
 @Injectable({
@@ -26,6 +27,16 @@ export class OrdersService {
 
   add(req: CreateOrder): Observable<CreateOrderResp> {
     return this.httpClient.post<CreateOrderResp>(this.orderApiUrl + '/orders', req)
+      .pipe(catchError(this.errorHandler))
+  }
+
+  list(): Observable<ListOrderResp> {
+    return this.httpClient.get<ListOrderResp>(this.orderApiUrl + '/orders')
+      .pipe(catchError(this.errorHandler))
+  }
+
+  cancel(id: string) {
+    return this.httpClient.delete(this.orderApiUrl + '/orders/' + id)
       .pipe(catchError(this.errorHandler))
   }
 
