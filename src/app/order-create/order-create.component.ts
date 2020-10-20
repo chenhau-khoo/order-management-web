@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { Router } from '@angular/router';
 import { OrdersService } from '../services/orders.service';
 import * as uuid from 'uuid';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-order-create',
@@ -17,7 +15,6 @@ export class OrderCreateComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router,
     private ordersService: OrdersService) { }
 
   // convenience getter for easy access to form fields
@@ -37,20 +34,8 @@ export class OrderCreateComponent implements OnInit {
     if (this.requestForm.invalid) {
       return;
     }
-    this.ordersService.add(this.requestForm.value).subscribe(
-      res => {
-        console.log(res);
-        Swal.fire({
-          icon: 'success',
-          title: 'Success!',
-          allowOutsideClick: false
-        }).then((result) => {
-          if (result.isConfirmed) {
-            console.log('confirmed');
-          }
-          console.log(result);
-        });
-      });
+    this.requestForm.value.requestId = uuid.v4();
+    this.ordersService.addOrder(this.requestForm.value);
   }
 
 }

@@ -1,12 +1,14 @@
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError, map, repeat } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { CreateOrder } from '../model/create-order';
 import { CreateOrderResp } from '../model/create-order-resp';
 import { ListOrderResp } from '../model/list-order-resp';
+import { Order } from '../model/order';
 import Swal from 'sweetalert2';
+import { AttrAst } from '@angular/compiler';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +16,11 @@ import Swal from 'sweetalert2';
 export class OrdersService {
 
   private orderApiUrl: string;
+  private orderCreated = new BehaviorSubject<Order>(null);
+  private orderDeleted = new BehaviorSubject<string>(null);
+
+  orderCreated$ = this.orderCreated.asObservable();
+  orderDeleted$ = this.orderDeleted.asObservable();
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -25,23 +32,31 @@ export class OrdersService {
     this.orderApiUrl = environment.order_api_url;
   }
 
-  add(req: CreateOrder): Observable<CreateOrderResp> {
-    return this.httpClient.post<CreateOrderResp>(this.orderApiUrl + '/orders', req)
+  addOrder = (req: CreateOrder) => {
+    this.httpClient.post<Order>(this.orderApiUrl + '/orders', req)
       .pipe(catchError(this.errorHandler))
+      .subscribe(
+        data => this.orderCreated.next(data)
+      );
   }
 
-  list(): Observable<ListOrderResp[]> {
-    return this.httpClient.get<ListOrderResp[]>(this.orderApiUrl + '/orders')
-      .pipe(catchError(this.errorHandler))
-  }
-
-  cancel(id: string) {
+  cancelOrder(id: string) {
     return this.httpClient.delete(this.orderApiUrl + '/orders/' + id)
+      .pipe(
+        map(data => {
+          this.orderDeleted.next(id);
+          return data;
+        }),
+        catchError(this.errorHandler));
+  }
+
+  getOrder(id: string): Observable<Order> {
+    return this.httpClient.get<Order>(this.orderApiUrl + '/orders/' + id)
       .pipe(catchError(this.errorHandler))
   }
 
-  get(id: string) {
-    return this.httpClient.get(this.orderApiUrl + '/orders/' + id)
+  getAllOrders(): Observable<Order[]> {
+    return this.httpClient.get<Order[]>(this.orderApiUrl + '/orders')
       .pipe(catchError(this.errorHandler))
   }
 

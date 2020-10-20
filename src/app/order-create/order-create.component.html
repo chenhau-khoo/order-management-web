@@ -3,8 +3,9 @@
     <form [formGroup]="requestForm" (ngSubmit)="onSubmit($event)">
         <div class="form-group">
             <label>Amount</label>
-            <input type="number" formControlName="amount" class="form-control"
-                [ngClass]="{ 'is-invalid': submitted && f.amount.errors }" placeholder="Enter Amount">
+            <input type="number" onKeyPress="if(this.value.length==4) return false;" formControlName="amount"
+                class="form-control" [ngClass]="{ 'is-invalid': submitted && f.amount.errors }"
+                placeholder="Enter Amount">
             <div *ngIf="submitted && f.amount.errors" class="invalid-feedback">
                 <div *ngIf="f.amount.errors.required">Amount is required</div>
             </div>
