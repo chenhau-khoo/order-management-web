@@ -40,6 +40,11 @@ export class OrdersService {
       .pipe(catchError(this.errorHandler))
   }
 
+  get(id: string) {
+    return this.httpClient.get(this.orderApiUrl + '/orders/' + id)
+      .pipe(catchError(this.errorHandler))
+  }
+
   errorHandler(error) {
     let errorMessage = '';
     if (error.error instanceof ErrorEvent) {

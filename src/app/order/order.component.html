@@ -10,13 +10,13 @@
             <td>Action</td>
         </tr>
         <tr *ngFor="let o of orders">
-            <td>{{ o.id }}</td>
+            <td><a [routerLink]="['/order', o.id]">{{ o.id }}</a></td>
             <td>{{ o.amount }}</td>
             <td>{{ o.desc }}</td>
             <td>{{ o.status }}</td>
             <td>{{ o.updatedOn | date: 'yyyy-MM-dd HH:mm:ss'  }}</td>
             <td>
-                <div *ngIf="o.status === 'CONFIRMED'">
+                <div *ngIf="o.status === 'CONFIRMED' || o.status === 'CREATED' ">
                     <button class="btn btn-danger" (click)="cancelOrder(o.id)">Cancel</button>
                 </div>
             </td>
