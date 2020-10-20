@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
 export class OrderComponent implements OnInit {
 
   show: boolean = false;
-  orders: ListOrderResp;
+  public orders: ListOrderResp[];
   constructor(private ordersService: OrdersService) { }
 
   ngOnInit() {
@@ -19,7 +19,7 @@ export class OrderComponent implements OnInit {
   }
 
   getAllOrders() {
-    this.ordersService.list().subscribe(data => {
+    this.ordersService.list().subscribe((data: ListOrderResp[]) => {
       this.orders = data;
       this.show = true;
     });

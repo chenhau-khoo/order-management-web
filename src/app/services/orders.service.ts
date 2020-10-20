@@ -30,8 +30,8 @@ export class OrdersService {
       .pipe(catchError(this.errorHandler))
   }
 
-  list(): Observable<ListOrderResp> {
-    return this.httpClient.get<ListOrderResp>(this.orderApiUrl + '/orders')
+  list(): Observable<ListOrderResp[]> {
+    return this.httpClient.get<ListOrderResp[]>(this.orderApiUrl + '/orders')
       .pipe(catchError(this.errorHandler))
   }
 
