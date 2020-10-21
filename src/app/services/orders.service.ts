@@ -55,7 +55,7 @@ export class OrdersService {
   }
 
   cancelOrder(id: string) {
-    return this.httpClient.delete<Order>(this.orderApiUrl + '/orders/' + id)
+    return this.httpClient.patch<Order>(this.orderApiUrl + '/orders/' + id + '/cancel', null)
       .pipe(
         map(data => {
           this.orderStatusChanged.next(data);
