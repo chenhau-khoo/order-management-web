@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ListOrderResp } from '../model/list-order-resp';
 import { OrdersService } from '../services/orders.service';
 import Swal from 'sweetalert2';
 import { Order } from '../model/order';
+import { interval, Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-order',
@@ -12,25 +12,42 @@ import { Order } from '../model/order';
 export class OrderComponent implements OnInit {
 
   show: boolean = false;
-  public orders: Order[];
+  orders: Order[];
+
   constructor(private ordersService: OrdersService) { }
 
   ngOnInit() {
     this.getAllOrders();
     // subscribe to orderCreated event
-    this.ordersService.orderCreated$.subscribe(data => {
-      if (data) {
-        this.orders.push(data);
+    this.ordersService.orderCreated$.subscribe(newOrder => {
+      console.log('newOrder:' + JSON.stringify(newOrder));
+      if (newOrder && this.orders) {
+        this.orders.push(newOrder);
+        if (newOrder.status === "CONFIRMED") {
+          const checkStatusSubscription = interval(2000).subscribe(() => {
+            console.log("checkStatusSubscriber");
+            this.ordersService.findOrderById(newOrder.id).subscribe(res => {
+              if (res.status !== "CONFIRMED") {
+                this.ordersService.setOrderStatusChanged(res);
+                checkStatusSubscription.unsubscribe();
+              }
+            });
+          });
+          // stop listening after 60 seconds
+          setInterval(() => checkStatusSubscription.unsubscribe(), 60000);
+        }
         this.orders.sort((a, b) => { return new Date(b.updatedOn).getTime() - new Date(a.updatedOn).getTime() });
       }
     });
-    // subscribe to orderDeleted event
-    this.ordersService.orderDeleted$.subscribe(data => {
-      if (data) {
-        const order: Order = this.orders.filter(o => o.id === data)[0];
-        order.status = "CANCELLED";
+
+    // subscribe to orderStatusChanged event
+    this.ordersService.orderStatusChanged$.subscribe(updatedOrder => {
+      console.log('updatedOrder:' + JSON.stringify(updatedOrder));
+      if (updatedOrder) {
+        const order: Order = this.orders.filter(o => o.id === updatedOrder.id)[0];
+        order.status = updatedOrder.status;
       }
-    })
+    });
   }
 
   getAllOrders() {
@@ -53,5 +70,9 @@ export class OrderComponent implements OnInit {
         });
       }
     })
+  }
+
+  ngOnDestroy() {
+    console.log("destroy");
   }
 }

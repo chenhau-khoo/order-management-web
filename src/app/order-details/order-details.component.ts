@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { FormGroup } from "@angular/forms";
 import { ActivatedRoute } from '@angular/router';
-import { GetOrderResp } from '../model/get-order-resp';
+import { Order } from '../model/order';
 import { OrdersService } from '../services/orders.service';
 
 @Component({
@@ -12,7 +12,7 @@ import { OrdersService } from '../services/orders.service';
 export class OrderDetailsComponent implements OnInit {
 
   show: boolean = false;
-  order: GetOrderResp;
+  order: Order;
   orderId: string;
   displayForm: FormGroup;
 
@@ -20,7 +20,7 @@ export class OrderDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.orderId = this.route.snapshot.paramMap.get('id');
-    this.ordersService.getOrder(this.orderId).subscribe((data: GetOrderResp) => {
+    this.ordersService.findOrderById(this.orderId).subscribe((data: Order) => {
       this.order = data;
       this.show = true;
     });
